@@ -1,0 +1,65 @@
+Name- Anubhav Shukla
+Reg No- 20BCE10611
+Vellore Institute of Technology, Bhopal
+Smart Bridge Assignment - 2
+
+
+Solution-
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras import models, layers
+
+# Load the dataset
+dataset_url = "https://www.apple.com/de/math.cdop-cleanlication"
+df = pd.read_csv(dataset_url)
+
+# Perform data preprocessing
+# Assuming the dataset has columns: 'Age', 'Sex', 'BP', 'Cholesterol', 'Na_to_K', 'Drug', 'Label'
+
+# Convert categorical variables to numerical labels
+categorical_cols = ['Sex', 'BP', 'Cholesterol', 'Drug']
+label_encoder = LabelEncoder()
+for col in categorical_cols:
+    df[col] = label_encoder.fit_transform(df[col])
+
+# Split the dataset into input features and target labels
+X = df.drop('Label', axis=1).values
+y = df['Label'].values
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Normalize the input features
+X_train = (X_train - np.mean(X_train)) / np.std(X_train)
+X_test = (X_test - np.mean(X_test)) / np.std(X_test)
+
+# Build the ANN model
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(X_train.shape[1],)))
+model.add(layers.Dense(16, activation='relu'))
+model.add(layers.Dense(8, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+
+# Compile the model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Train the model
+epochs = 10
+model.fit(X_train, y_train, epochs=epochs, batch_size=16, verbose=1)
+
+# Test the model with random data
+random_data = np.array([[50, 0, 2, 1, 3.5, 2]])
+random_data = (random_data - np.mean(X_train)) / np.std(X_train)
+prediction = model.predict(random_data)
+predicted_class = label_encoder.inverse_transform([int(prediction)])
+print("Predicted Class:", predicted_class)
+
+
+Please note that since the dataset link you provided is not accessible, the code assumes that you have loaded the dataset into a Pandas DataFrame called df with the appropriate columns as mentioned in the code comments. You would need to replace the dataset_url with the correct URL or the local path to the dataset file.
+
+Make sure to adjust the model architecture, hyperparameters, and data preprocessing steps based on your specific requirements and dataset characteristics.
+
+Also, note that this example assumes binary classification (two classes) since the loss function used is binary cross-entropy. If your dataset has more than two classes, you would need to adjust the model architecture, output layer activation function, and loss function accordingly.
